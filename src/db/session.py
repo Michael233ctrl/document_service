@@ -13,12 +13,16 @@ class _MongoClientSingleton:
             cls.instance.mongo_client = motor_asyncio.AsyncIOMotorClient(
                 settings.MONGO_DATABASE_URI
             )
-            cls.instance.engine = AIOEngine(client=cls.instance.mongo_client, database=settings.MONGO_DATABASE)
+            cls.instance.engine = AIOEngine(
+                client=cls.instance.mongo_client, database=settings.MONGO_DATABASE
+            )
         return cls.instance
 
 
 def MongoDatabase() -> core.AgnosticDatabase:
-    return _MongoClientSingleton().mongo_client[settings.MONGO_DATABASE]
+    if client := _MongoClientSingleton().mongo_client:
+        return client[settings.MONGO_DATABASE]
+    raise ValueError("Mongo client is not initialized")
 
 
 def get_engine() -> AIOEngine:

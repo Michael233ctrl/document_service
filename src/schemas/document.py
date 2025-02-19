@@ -1,5 +1,7 @@
-from pydantic import BaseModel, ConfigDict
 from odmantic import ObjectId
+from pydantic import BaseModel, ConfigDict
+
+from src.models.user import User as UserModel
 
 from .user import User
 
@@ -10,11 +12,10 @@ class DocumentBase(BaseModel):
 
 
 class DocumentCreate(DocumentBase):
-    author: User | None = None
+    author: UserModel
 
 
-class DocumentUpdate(DocumentBase):
-    ...
+class DocumentUpdate(DocumentBase): ...
 
 
 class DocumentInDBBase(DocumentBase):

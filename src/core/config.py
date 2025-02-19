@@ -1,8 +1,7 @@
 import os
 
-from dotenv import load_dotenv, find_dotenv
+from dotenv import find_dotenv, load_dotenv
 from pydantic import EmailStr
-
 from pydantic_settings import BaseSettings
 
 load_dotenv(dotenv_path=find_dotenv())
@@ -20,16 +19,20 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_SECONDS: int = os.getenv("REFRESH_TOKEN_EXPIRE_SECONDS")
     JWT_ALGO: str = os.getenv("JWT_ALGORITHM")
 
-    AUTH_URL: str = os.getenv('AUTH_URL')
+    AUTH_URL: str = os.getenv("AUTH_URL")
 
     # Mongo config
     MONGO_DATABASE_URI: str = os.getenv("MONGO_DATABASE_URI")
     MONGO_DATABASE: str = os.getenv("MONGO_DATABASE")
     if os.getenv("MONGO_REPLICA_SET"):
-        MONGO_DATABASE = MONGO_DATABASE+f'&replicaSet={os.getenv("MONGO_REPLICA_SET_NAME")}'
+        MONGO_DATABASE = (
+            MONGO_DATABASE + f'&replicaSet={os.getenv("MONGO_REPLICA_SET_NAME")}'
+        )
 
     FIRST_SUPERUSER: EmailStr = os.getenv("FIRST_SUPERUSER")
     FIRST_SUPERUSER_PASSWORD: str = os.getenv("FIRST_SUPERUSER_PASSWORD")
+
+    LIMIT_OF_DOCUMENT_VERSIONS: int = 5
 
 
 settings = Settings()
