@@ -1,5 +1,5 @@
 from datetime import datetime
-from odmantic import Field, Reference, ObjectId
+from odmantic import Field, Reference
 
 from src.db.base_class import Base
 from src.utils.common import datetime_now_sec
@@ -13,4 +13,3 @@ class Document(Base):
     title: str = Field(default="")
     content: str = Field(default="")
     author: User = Reference()
-    versions: list[ObjectId] = Field(default_factory=list)

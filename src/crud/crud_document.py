@@ -17,7 +17,6 @@ class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
         db: AgnosticDatabase,
         *,
         document_db_obj: Document,
-        document_version_db_obj: DocumentVersion,
         obj_in: Union[UpdateSchemaType, Dict[str, Any]],
         session: AIOSessionType = None
     ) -> Document:
@@ -33,12 +32,6 @@ class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
 
         # TODO: Check if this saves changes with the setattr calls
         document_db_obj.modified = datetime_now_sec()
-        await self.add_version(
-            db,
-            document_db_obj=document_db_obj,
-            document_version_db_obj=document_version_db_obj,
-            session=session,
-        )
         await self.engine.save(document_db_obj, session=session)
         return document_db_obj
 
@@ -53,18 +46,6 @@ class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
         document_db_obj.title = document_version_db_obj.title
         document_db_obj.content = document_version_db_obj.content
         document_db_obj.modified = datetime_now_sec()
-        await self.engine.save(document_db_obj, session=session)
-        return document_db_obj
-
-    async def add_version(
-        self,
-        db: AgnosticDatabase,
-        *,
-        document_db_obj: Document,
-        document_version_db_obj: DocumentVersion,
-        session: AIOSessionType = None
-    ) -> Document:
-        document_db_obj.versions.append(document_version_db_obj.id)
         await self.engine.save(document_db_obj, session=session)
         return document_db_obj
 

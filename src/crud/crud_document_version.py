@@ -6,7 +6,6 @@ from odmantic import ObjectId
 from odmantic.engine import AIOSessionType
 
 from src.crud.base import CRUDBase
-from src.models.document import Document
 from src.models.document_version import DocumentVersion
 from src.schemas import DocumentVersionCreate, DocumentVersionUpdate
 from src.core.config import settings

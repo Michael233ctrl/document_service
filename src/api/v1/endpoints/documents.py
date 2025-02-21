@@ -24,16 +24,11 @@ async def create_document(
             title=title, content=content, author=current_user
         ),
     )
-    document_version_db_obj = await crud.document_version.create(
+    await crud.document_version.create(
         db,
         obj_in=schemas.DocumentVersionCreate(
             document_id=document.id, title=document.title, content=document.content
         ),
-    )
-    document = await crud.document.add_version(
-        db,
-        document_db_obj=document,
-        document_version_db_obj=document_version_db_obj,
     )
     return document
 
@@ -103,13 +98,10 @@ async def update_document(
     async with await db.client.start_session() as session:
         async with session.start_transaction():    
     """
-    document_version = await crud.document_version.create(
-        db, obj_in=document_version_in
-    )
+    await crud.document_version.create(db, obj_in=document_version_in)
     document = await crud.document.update(
         db=db,
         document_db_obj=document,
-        document_version_db_obj=document_version,
         obj_in=obj_in,
     )
 
