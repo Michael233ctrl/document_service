@@ -19,7 +19,12 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_SECONDS: int = os.getenv("REFRESH_TOKEN_EXPIRE_SECONDS")
     JWT_ALGO: str = os.getenv("JWT_ALGORITHM")
 
-    AUTH_URL: str = os.getenv("AUTH_URL")
+    # Auth server
+    AUTH_SERVICE_URL: str = os.getenv("AUTH_SERVICE_URL")
+    AUTH_API_V1_STR: str = os.getenv("AUTH_API_V1_STR")
+    OAUTH_URL: str = os.getenv("OAUTH_URL")
+    AUTH_URL: str = AUTH_SERVICE_URL + AUTH_API_V1_STR + OAUTH_URL
+    GET_USER_URL: str = AUTH_SERVICE_URL + API_V1_STR + "/users/me"
 
     # Mongo config
     MONGO_DATABASE_URI: str = os.getenv("MONGO_DATABASE_URI")

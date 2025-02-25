@@ -16,7 +16,7 @@ async def create_document(
     db: AgnosticDatabase = Depends(deps.get_db),
     title: str = Body(...),
     content: str = Body(...),
-    current_user: models.User = Depends(deps.get_current_active_superuser),
+    current_user: models.User = Depends(deps.get_current_user),
 ):
     document = await crud.document.create(
         db,
@@ -37,7 +37,7 @@ async def create_document(
 async def read_all_documents(
     *,
     db: AgnosticDatabase = Depends(deps.get_db),
-    _: models.User = Depends(deps.get_current_active_superuser),
+    _: models.User = Depends(deps.get_current_user),
     page: int = 0,
 ) -> Any:
     """
@@ -51,7 +51,7 @@ async def read_document(
     *,
     db: AgnosticDatabase = Depends(deps.get_db),
     document_id: ObjectId,
-    _: models.User = Depends(deps.get_current_active_user),
+    _: models.User = Depends(deps.get_current_user),
 ):
     document = await crud.document.get(db=db, id=document_id)
     if not document:
@@ -69,7 +69,7 @@ async def update_document(
     db: AgnosticDatabase = Depends(deps.get_db),
     document_id: ObjectId,
     obj_in: schemas.DocumentUpdate,
-    _: models.User = Depends(deps.get_current_active_superuser),
+    _: models.User = Depends(deps.get_current_user),
 ):
     document = await crud.document.get(db=db, id=document_id)
     if not document:
@@ -113,7 +113,7 @@ async def delete_document(
     *,
     db: AgnosticDatabase = Depends(deps.get_db),
     document_id: ObjectId,
-    _: models.User = Depends(deps.get_current_active_superuser),
+    _: models.User = Depends(deps.get_current_user),
 ):
     document = await crud.document.get(db=db, id=document_id)
     if not document:
@@ -129,7 +129,7 @@ async def read_document_version_history(
     *,
     db: AgnosticDatabase = Depends(deps.get_db),
     document_id: ObjectId,
-    _: models.User = Depends(deps.get_current_active_superuser),
+    _: models.User = Depends(deps.get_current_user),
 ):
     versions = await crud.document_version.get_by_document_id(db, document_id)
     return versions
@@ -141,7 +141,7 @@ async def rollback_document(
     db: AgnosticDatabase = Depends(deps.get_db),
     document_id: ObjectId,
     document_version_id: ObjectId,
-    _: models.User = Depends(deps.get_current_active_superuser),
+    _: models.User = Depends(deps.get_current_user),
 ):
     document = await crud.document.get(db=db, id=document_id)
     if not document:

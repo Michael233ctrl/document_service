@@ -1,13 +1,12 @@
+import httpx
 from typing import Generator
 
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from jose import jwt
 from motor.core import AgnosticDatabase
-from pydantic import ValidationError
 
-from src import schemas, models, crud
+from src import models
 from src.core.config import settings
 from src.db.session import MongoDatabase
 
@@ -23,47 +22,18 @@ def get_db() -> Generator:
         pass
 
 
-def get_token_payload(token: str) -> schemas.TokenPayload:
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGO])
-        token_data = schemas.TokenPayload(**payload)
-    except (jwt.JWTError, ValidationError):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
-        )
-    return token_data
-
-
 async def get_current_user(
     db: AgnosticDatabase = Depends(get_db), token: str = Depends(reusable_oauth2)
 ) -> models.User:
-    token_data = get_token_payload(token)
-    if token_data.refresh or token_data.totp:
-        # Refresh token is not a valid access token and TOTP True can only be used to validate TOTP
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            settings.GET_USER_URL,
+            headers={"Authorization": f"Bearer {token}"},
         )
-    user = await crud.user.get(db, id=token_data.sub)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
 
-
-async def get_current_active_user(
-    current_user: models.User = Depends(get_current_user),
-) -> models.User:
-    if not crud.user.is_active(current_user):
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
-
-async def get_current_active_superuser(
-    current_user: models.User = Depends(get_current_user),
-) -> models.User:
-    if not crud.user.is_superuser(current_user):
+    if response.status_code != 200:
         raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
+            status_code=response.status_code, detail="Authentication failed"
         )
-    return current_user
+    user_data = response.json()
+    return models.User(**user_data)

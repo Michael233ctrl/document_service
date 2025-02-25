@@ -1,16 +1,13 @@
-from pydantic import BaseModel, EmailStr, StringConstraints, ConfigDict, field_validator, Field, SecretStr
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    ConfigDict,
+)
 from odmantic import ObjectId
-
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
 
 
 class UserBase(BaseModel):
     email: EmailStr
-    is_active: bool
-    is_superuser: bool
     full_name: str
 
 
